@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"project/internal/storage" // Обновите путь импорта согласно вашей структуре проекта
+	"github.com/vagonaizer/ozon-project/internal/storage"
 
 	"github.com/gorilla/mux"
 )

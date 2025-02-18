@@ -12,9 +12,9 @@ import (
 	"log"
 	"net/http"
 
-	"project/internal/handlers" // Обновите путь импорта согласно вашему проекту
-	router "project/internal/routers"
-	"project/internal/storage" // Обновите путь импорта согласно вашему проекту
+	"github.com/vagonaizer/ozon-project/internal/handlers" // Обновите путь импорта согласно вашему проекту
+	router "github.com/vagonaizer/ozon-project/internal/routers"
+	"github.com/vagonaizer/ozon-project/internal/storage" // Обновите путь импорта согласно вашему проекту
 )
 
 func main() {

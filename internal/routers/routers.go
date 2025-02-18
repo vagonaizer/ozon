@@ -3,7 +3,8 @@ package router
 import (
 	"fmt"
 	"net/http"
-	"project/internal/handlers" // Обновите путь импорта согласно вашему проекту
+
+	"github.com/vagonaizer/ozon-project/internal/handlers"
 
 	"github.com/gorilla/mux"
 )
