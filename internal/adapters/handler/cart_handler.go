@@ -17,25 +17,40 @@ func NewCartHandler(cartService ports.CartService) *CartHandler {
 }
 
 func (h *CartHandler) AddItem(w http.ResponseWriter, r *http.Request) {
-	userID, _ := strconv.ParseInt(r.PathValue("user_id"), 10, 64)
-	skuID, _ := strconv.ParseInt(r.PathValue("sku_id"), 10, 64)
+
+	// userID валидация
+
+	userID, err := strconv.ParseInt(r.PathValue("user_id"), 10, 64)
+	if err != nil || userID <= 0 {
+		http.Error(w, "invalid user ID: user ID must be a positive integer", http.StatusBadRequest)
+		return
+	}
+
+	skuID, err := strconv.ParseInt(r.PathValue("sku_id"), 10, 64)
+	if err != nil || skuID <= 0 {
+		http.Error(w, "invalid SKU ID: SKU ID must be a positive integer", http.StatusBadRequest)
+		return
+	}
 
 	var requestBody struct {
 		Count uint16 `json:"count"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
-		http.Error(w, "invalid request body", http.StatusBadRequest)
+		http.Error(w, "invalid request body", http.StatusBadRequest) // исправить ошибки
 		return
 	}
 
-	cart, err := h.cartService.AddItem(userID, skuID, requestBody.Count)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if requestBody.Count <= 0 {
+		http.Error(w, "invalid count: count must be a non-negative integer", http.StatusBadRequest)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(cart)
+	if err := h.cartService.AddItem(userID, skuID, requestBody.Count); err != nil {
+		http.Error(w, err.Error(), http.StatusPreconditionFailed)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func (h *CartHandler) RemoveItem(w http.ResponseWriter, r *http.Request) {
@@ -43,11 +58,11 @@ func (h *CartHandler) RemoveItem(w http.ResponseWriter, r *http.Request) {
 	skuID, _ := strconv.ParseInt(r.PathValue("sku_id"), 10, 64)
 
 	if err := h.cartService.RemoveItem(userID, skuID); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusPreconditionFailed) // везде исправить
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
 }
 
 func (h *CartHandler) ClearCart(w http.ResponseWriter, r *http.Request) {
@@ -58,7 +73,7 @@ func (h *CartHandler) ClearCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
 }
 
 func (h *CartHandler) GetCart(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +81,7 @@ func (h *CartHandler) GetCart(w http.ResponseWriter, r *http.Request) {
 
 	cart, err := h.cartService.GetCart(userID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 

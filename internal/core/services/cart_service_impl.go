@@ -19,10 +19,12 @@ func NewCartService(productService ports.ProductService) *CartServiceImpl {
 	}
 }
 
-func (s *CartServiceImpl) AddItem(userID int64, skuID int64, count uint16) (*domain.Cart, error) {
+// убрать возврат значения
+
+func (s *CartServiceImpl) AddItem(userID int64, skuID int64, count uint16) error {
 	product, err := s.productService.GetProduct(skuID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	cart, exists := s.carts[userID]
@@ -38,7 +40,7 @@ func (s *CartServiceImpl) AddItem(userID int64, skuID int64, count uint16) (*dom
 		if item.SKU == skuID {
 			cart.Items[i].Count += count
 			cart.TotalPrice += product.Price * uint32(count)
-			return cart, nil
+			return nil
 		}
 	}
 
@@ -50,7 +52,7 @@ func (s *CartServiceImpl) AddItem(userID int64, skuID int64, count uint16) (*dom
 	})
 	cart.TotalPrice += product.Price * uint32(count)
 
-	return cart, nil
+	return nil
 }
 
 func (s *CartServiceImpl) RemoveItem(userID int64, skuID int64) error {

@@ -10,6 +10,10 @@ import (
 	"github.com/vagonaizer/go-cart/internal/core/ports"
 )
 
+const (
+	StatusEnhanceYourCalm = 420
+)
+
 type ProductRepository struct {
 	baseURL string
 	client  *http.Client
@@ -54,7 +58,7 @@ func (r *ProductRepository) GetProduct(skuID int64) (*ports.Product, error) {
 				Name:  productResponse.Name,
 				Price: productResponse.Price,
 			}, nil
-		case 420, 429:
+		case StatusEnhanceYourCalm, http.StatusTooManyRequests:
 			time.Sleep(time.Second * time.Duration(i+1))
 			continue
 		default:
@@ -63,32 +67,4 @@ func (r *ProductRepository) GetProduct(skuID int64) (*ports.Product, error) {
 	}
 
 	return nil, errors.New("max retries exceeded")
-}
-
-func (r *ProductRepository) ListSKUs(startAfterSku int64, count int) ([]int64, error) {
-	requestBody := map[string]interface{}{
-		"token":         "testtoken",
-		"startAfterSku": startAfterSku,
-		"count":         count,
-	}
-	requestBodyBytes, _ := json.Marshal(requestBody)
-
-	resp, err := http.Post(r.baseURL+"/list_skus", "application/json", bytes.NewReader(requestBodyBytes))
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, errors.New("failed to list SKUs")
-	}
-
-	var skuResponse struct {
-		SKUs []int64 `json:"skus"`
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&skuResponse); err != nil {
-		return nil, err
-	}
-
-	return skuResponse.SKUs, nil
 }
