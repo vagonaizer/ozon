@@ -77,7 +77,11 @@ func (h *CartHandler) ClearCart(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *CartHandler) GetCart(w http.ResponseWriter, r *http.Request) {
-	userID, _ := strconv.ParseInt(r.PathValue("user_id"), 10, 64)
+	userID, err := strconv.ParseInt(r.PathValue("user_id"), 10, 64)
+	if err != nil || userID <= 0 {
+		http.Error(w, "invalid user ID: user ID must be a positive integer", http.StatusBadRequest)
+		return
+	}
 
 	cart, err := h.cartService.GetCart(userID)
 	if err != nil {
@@ -86,5 +90,8 @@ func (h *CartHandler) GetCart(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(cart)
+	if err := json.NewEncoder(w).Encode(cart); err != nil {
+		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+		return
+	}
 }
