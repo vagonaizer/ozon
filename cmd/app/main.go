@@ -8,6 +8,7 @@ import (
 	"github.com/vagonaizer/go-cart/internal/adapters/handler"
 	"github.com/vagonaizer/go-cart/internal/adapters/repository"
 	"github.com/vagonaizer/go-cart/internal/core/services"
+	"github.com/vagonaizer/go-cart/internal/logger"
 	"gopkg.in/yaml.v3"
 )
 
@@ -16,7 +17,6 @@ import (
 //
 
 type Config struct {
-	Host           string `yaml:"host"`
 	Port           string `yaml:"port"`
 	ProductService string `yaml:"product_service"`
 }
@@ -39,10 +39,12 @@ func main() {
 	cartService := services.NewCartService(productRepo)
 	cartHandler := handler.NewCartHandler(cartService)
 
-	http.HandleFunc("POST /user/{user_id}/cart/{sku_id}", cartHandler.AddItem)
-	http.HandleFunc("DELETE /user/{user_id}/cart/{sku_id}", cartHandler.RemoveItem)
-	http.HandleFunc("DELETE /user/{user_id}/cart", cartHandler.ClearCart)
-	http.HandleFunc("GET /user/{user_id}/cart", cartHandler.GetCart)
+	logger := logger.New()
+
+	http.Handle("POST /user/{user_id}/cart/{sku_id}", handler.LoggingMiddleware(http.HandlerFunc(cartHandler.AddItem), logger))
+	http.Handle("DELETE /user/{user_id}/cart/{sku_id}", handler.LoggingMiddleware(http.HandlerFunc(cartHandler.RemoveItem), logger))
+	http.Handle("DELETE /user/{user_id}/cart", handler.LoggingMiddleware(http.HandlerFunc(cartHandler.ClearCart), logger))
+	http.Handle("GET /user/{user_id}/cart", handler.LoggingMiddleware(http.HandlerFunc(cartHandler.GetCart), logger))
 
 	log.Println("Server started at :8082")
 	if err := http.ListenAndServe(config.Port, nil); err != nil {
