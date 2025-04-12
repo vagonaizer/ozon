@@ -1,0 +1,6 @@
+ps_config:
+  product_service_url: "http://route256.pavl.uk:8080"  
+  product_service_token: "testtoken"  
+server_config:
+  port: "8082"                  
+  bind_ip: "localhost"               
