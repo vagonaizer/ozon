@@ -1,3 +1,5 @@
+// TODO убрать в logger
+// в middleware сделать обертку над хендлер
 package logging
 
 import (

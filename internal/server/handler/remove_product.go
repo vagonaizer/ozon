@@ -24,7 +24,7 @@ func (h *Handler) RemoveProduct(w http.ResponseWriter, r *http.Request) {
 
 	if err := h.cartService.RemoveItem(userID, skuID); err != nil {
 		// Упрощаем проверку ошибок, так как оригинальные ошибки не экспортируются
-		if err.Error() == "invalid user_id" || err.Error() == "invalid sku_id" {
+		if err.Error() == "invalid user_id" || err.Error() == "invalid sku_id" { // импортировать ошибки из бизнес логики
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		} else {
 			http.Error(w, "internal server error", http.StatusInternalServerError)

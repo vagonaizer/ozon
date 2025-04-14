@@ -48,10 +48,10 @@ func (r *CartRepo) AddItem(userID int64, skuID int64, count uint16) error {
 }
 
 func (r *CartRepo) RemoveItem(userID int64, skuID int64) error {
-	if _, ok := r.items[userID]; !ok {
-		log.Printf("(RemoveItem) cart_repo.go: Cart not found or not existing, userID=%d", userID)
-		return ErrCartNotFound
-	}
+	// if _, ok := r.items[userID]; !ok {
+	// 	log.Printf("(RemoveItem) cart_repo.go: Cart not found or not existing, userID=%d", userID)
+	// 	return ErrCartNotFound
+	// } нахуй не нужно
 
 	// существует ли айтем
 

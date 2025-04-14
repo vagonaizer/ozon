@@ -2,6 +2,6 @@ package utils
 
 import "net/http"
 
-func SuccessReponse(w http.ResponseWriter) {
+func SuccessResponse(w http.ResponseWriter) {
 	w.Write([]byte("{}"))
 }

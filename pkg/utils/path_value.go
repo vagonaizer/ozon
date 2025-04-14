@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func GetIntPathValue(r *http.Request, field string) (int64, error) {
+func GetIntPathValue(r *http.Request, field string) (int64, error) { // TODO
 	valueRaw := r.PathValue(field)
 	value, err := strconv.ParseInt(valueRaw, 10, 64)
 	if err != nil {

@@ -28,5 +28,5 @@ func (h *Handler) ClearCart(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-	utils.SuccessReponse(w)
+	utils.SuccessResponse(w)
 }

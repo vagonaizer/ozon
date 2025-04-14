@@ -19,7 +19,7 @@ type cartRepository interface {
 type GetProductResponse = model.GetProductResponse
 
 type productService interface {
-	GetProduct(skuID uint32) (*GetProductResponse, error)
+	GetProduct(skuID uint32) (*GetProductResponse, error) //
 }
 
 type CartService struct {
@@ -61,7 +61,7 @@ func (cs *CartService) RemoveItem(userID int64, skuID int64) error {
 	}
 	if skuID < 1 {
 		logger.Error("Invalid skuID")
-		return ErrInvalidSkuID
+		return ErrInvalidSkuID // TODO
 	}
 
 	err := cs.cartRepository.RemoveItem(userID, skuID)
@@ -104,9 +104,9 @@ func (cs *CartService) GetCart(userID int64) (*model.Cart, error) {
 			log.Println("GetProduct error", cart.Items[i].SkuID, err)
 			return nil, err
 		}
-		cart.Items[i].Name = product.Name
-		cart.Items[i].Price = product.Price
-		cart.TotalPrice += product.Price * uint32(cart.Items[i].Count)
+		cart.Items[i].Name = product.Name                              // бизнес логика (логики подсчета не должно быть на слое репозитория)
+		cart.Items[i].Price = product.Price                            // бизнес логика
+		cart.TotalPrice += product.Price * uint32(cart.Items[i].Count) // бизнес логика
 	}
 
 	return cart, nil

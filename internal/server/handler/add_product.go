@@ -83,5 +83,5 @@ func (h *Handler) AddProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.SuccessReponse(w)
+	utils.SuccessResponse(w)
 }

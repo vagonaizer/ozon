@@ -36,6 +36,8 @@ func GetConfig() (*Config, error) {
 			return
 		}
 		instance = &cfg
+
+		// заменить yaml.NewDecoder().Decode(&cfg)
 	})
 	return instance, nil
 }
