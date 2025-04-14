@@ -48,13 +48,6 @@ func (r *CartRepo) AddItem(userID int64, skuID int64, count uint16) error {
 }
 
 func (r *CartRepo) RemoveItem(userID int64, skuID int64) error {
-	// if _, ok := r.items[userID]; !ok {
-	// 	log.Printf("(RemoveItem) cart_repo.go: Cart not found or not existing, userID=%d", userID)
-	// 	return ErrCartNotFound
-	// } нахуй не нужно
-
-	// существует ли айтем
-
 	delete(r.items[userID], skuID)
 
 	return nil
@@ -84,12 +77,9 @@ func (r *CartRepo) GetCart(userID int64) (*model.Cart, error) {
 		Items:      make(model.Items, 0),
 	}
 
-	totalPrice := uint32(0)
 	for _, item := range userItems {
 		cart.Items = append(cart.Items, item)
-		totalPrice += item.Price * uint32(item.Count)
 	}
-	cart.TotalPrice = totalPrice
 
 	return cart, nil
 }
