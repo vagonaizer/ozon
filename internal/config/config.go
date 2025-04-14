@@ -25,19 +25,23 @@ var (
 )
 
 func GetConfig() (*Config, error) {
+	var err error
 	once.Do(func() {
-		data, err := os.ReadFile("config.yml")
+		file, err := os.Open("config.yml")
 		if err != nil {
 			return
 		}
+		defer file.Close()
 
 		var cfg Config
-		if err = yaml.Unmarshal(data, &cfg); err != nil {
+		if err = yaml.NewDecoder(file).Decode(&cfg); err != nil {
 			return
 		}
 		instance = &cfg
-
-		// заменить yaml.NewDecoder().Decode(&cfg)
 	})
+
+	if err != nil {
+		return nil, err
+	}
 	return instance, nil
 }
