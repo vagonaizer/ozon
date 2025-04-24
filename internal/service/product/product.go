@@ -1,3 +1,4 @@
+// -- TODO: roundTripper
 package product
 
 import (
@@ -34,30 +35,24 @@ func NewProductClient(client *http.Client, baseURL string, token string) *Produc
 
 func (pc *ProductClient) GetProduct(skuID uint32) (*GPResponse, error) {
 	logger := logging.GetLogger()
-	logger.Info("ProductClient.GetProduct called with skuID=%d", skuID)
 
 	reqBody := GPRequest{
 		Token: pc.token,
 		SkuID: skuID,
 	}
-	logger.Debug("Constructed GPRequest: %+v", reqBody)
 
 	body, err := json.Marshal(reqBody)
 	if err != nil {
-		logger.Error("Error marshaling request: %v", err)
 		return nil, fmt.Errorf("marshal request: %w", err)
 	}
-	logger.Debug("Marshalled request body: %s", string(body))
 
 	url := pc.baseURL + "/get_product"
-	logger.Info("POST request to URL: %s", url)
+
 	resp, err := pc.client.Post(url, "application/json", bytes.NewReader(body))
 	if err != nil {
-		logger.Error("HTTP post error: %v", err)
 		return nil, fmt.Errorf("http post: %w", err)
 	}
 	defer resp.Body.Close()
-	logger.Info("Received HTTP response with status: %d", resp.StatusCode)
 
 	if resp.StatusCode != http.StatusOK {
 		logger.Error("Unexpected status code: %d", resp.StatusCode)
@@ -70,7 +65,6 @@ func (pc *ProductClient) GetProduct(skuID uint32) (*GPResponse, error) {
 		logger.Error("Error decoding response: %v", err)
 		return nil, fmt.Errorf("decode response: %w", err)
 	}
-	logger.Info("Decoded response: %+v", result)
 
 	return &result, nil
 }

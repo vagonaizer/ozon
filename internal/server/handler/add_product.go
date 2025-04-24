@@ -29,7 +29,7 @@ func NewHandler(cs cartService) *Handler {
 }
 
 type AddProductRequest struct {
-	Count uint16 `json:"count" validate:"gt=0"`
+	Count uint16 `json:"count" validate:"gt=0"` // gt - greter than 0
 }
 
 func (h *Handler) AddProduct(w http.ResponseWriter, r *http.Request) {
@@ -71,7 +71,6 @@ func (h *Handler) AddProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.cartService.AddItem(userID, skuID, req.Count); err != nil {
-		// Маппинг ошибок на статус-коды:
 		switch err {
 		case cart.ErrInvalidUserID, cart.ErrInvalidSkuID, cart.ErrInvalidProductCount:
 			http.Error(w, "{}", http.StatusBadRequest)

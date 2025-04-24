@@ -9,7 +9,7 @@ build:
 	@go build -o $(BUILD_DIR)/$(APP_NAME) $(SOURCE_DIR)
 	@echo "Собранный бинарник: $(BUILD_DIR)/$(APP_NAME)"
 
-run-all: build
+run-all: build test-coverage
 	@echo "Запуск приложения..."
 	@$(BUILD_DIR)/$(APP_NAME)
 
@@ -23,3 +23,9 @@ test-coverage:
 	go test -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out -o coverage.html
 	go tool cover -func=coverage.out
+
+gocyclo:
+	gocyclo -over 10 ./...
+
+gocognit:
+	gocognit -over 15 ./...

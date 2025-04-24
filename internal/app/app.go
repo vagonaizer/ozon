@@ -3,6 +3,7 @@ package app
 import (
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 	"route256/cart/internal/config"
 	"route256/cart/internal/repository"
@@ -10,6 +11,7 @@ import (
 	"route256/cart/internal/service/cart"
 	"route256/cart/internal/service/product"
 	"route256/cart/pkg/middleware/logging"
+	"time"
 )
 
 type App struct {
@@ -26,7 +28,7 @@ func NewApp() *App {
 	logger := logging.GetLogger()
 	logger.Info("logger initialized")
 
-	cfg, _ := config.GetConfig() // если не будет работать -> cleanenv
+	cfg, _ := config.GetConfig()
 	logger.Info("config initialized")
 
 	cartRepo := repository.NewCartRepository()
@@ -66,6 +68,25 @@ func (a *App) Run() {
 	}
 	addr := fmt.Sprintf("%s:%s", bindIP, port)
 
+	wrappedHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
+		slog.Info("incoming request",
+			slog.String("method", r.Method),
+			slog.String("path", r.URL.Path),
+			slog.String("remote_addr", r.RemoteAddr),
+		)
+
+		// Вызов оригинального обработчика
+		http.DefaultServeMux.ServeHTTP(w, r)
+
+		slog.Info("request completed",
+			slog.String("method", r.Method),
+			slog.String("path", r.URL.Path),
+			slog.Duration("duration", time.Since(start)),
+		)
+	})
+
 	a.logger.Info(fmt.Sprintf("Server listening on %s", addr))
-	log.Fatal(http.ListenAndServe(addr, nil))
+	log.Fatal(http.ListenAndServe(addr, wrappedHandler))
 }
